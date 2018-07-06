@@ -3,20 +3,20 @@
 ## Ansible Setup
 
 1. Install `>= ansible2.5`
-- I used `sudo pip install ansible` on Ubuntu Mate 18.04 and it worked
-1. Fill in inventory file `prod` with ssh connection information to a server
-- If you need RSA key, or want to make one just for ansible, run ssh-keygen
-- Put your username and key file name in the `prod` file with the IP of your server
-1. Fill out and encrypt the host_vars/vault.yml file
-- You will need to track down your PIA account details and make a NAS samba user for the media server. See below for how to make a new samba user.
-- Run ansible-vault encrypt on the vault.yml file...keep the password you used somewhere safe!
-1. Create ~/.vault_pass.txt with password for decrypt during provision
-- This is just a file containing only your password you just made. It seems common that it goes into your home directory. `chmod` the permissions to 600, at least.
-1. Make sure you have the angstwad.docker_ubuntu role in your `~/.ansible/roles/` path
+    - I used `sudo pip install ansible` on Ubuntu Mate 18.04 and it worked
+2. Fill in inventory file `prod` with ssh connection information to a server
+    - If you need RSA key, or want to make one just for ansible, run ssh-keygen
+    - Put your username and key file name in the `prod` file with the IP of your server
+3. Fill out and encrypt the host_vars/vault.yml file
+    - You will need to track down your PIA account details and make a NAS samba user for the media server. See below for how to make a new samba user.
+    - Run ansible-vault encrypt on the vault.yml file...keep the password you used somewhere safe!
+4. Create ~/.vault_pass.txt with password for decrypt during provision
+    - This is just a file containing only your password you just made. It seems common that it goes into your home directory. `chmod` the permissions to 600, at least.
+5. Make sure you have the angstwad.docker_ubuntu role in your `~/.ansible/roles/` path
         ansible-galaxy install angstwad.docker_ubuntu
-1. run
+6. run
         ansible-playbook -i prod site.yml --vault-password-file ~/.vault_pass.txt
-- --ask-sudo-pass also likely to be needed
+    - --ask-sudo-pass also likely to be needed
 
 __Ansible will now run, but a lot of things will be wrong__
 
