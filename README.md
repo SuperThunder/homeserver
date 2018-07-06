@@ -1,13 +1,77 @@
-# How I did it
+# How to use it
+
+## Ansible Setup
 
 1. Install `>= ansible2.5`
-2. Fill in inventory file `prod` with ssh connection information to a server
-3. Fill out and encrypt the host_vars/vault.yml file
-4. Create .vault_pass with password for decrypt during provision
-5. Make sure you have the angstwad.docker_ubuntu role in your `~/.ansible/roles/` path
+- I used `sudo pip install ansible` on Ubuntu Mate 18.04 and it worked
+1. Fill in inventory file `prod` with ssh connection information to a server
+- If you need RSA key, or want to make one just for ansible, run ssh-keygen
+- Put your username and key file name in the `prod` file with the IP of your server
+1. Fill out and encrypt the host_vars/vault.yml file
+- You will need to track down your PIA account details and make a NAS samba user for the media server. See below for how to make a new samba user.
+- Run ansible-vault encrypt on the vault.yml file...keep the password you used somewhere safe!
+1. Create ~/.vault_pass.txt with password for decrypt during provision
+- This is just a file containing only your password you just made. It seems common that it goes into your home directory. `chmod` the permissions to 600, at least.
+1. Make sure you have the angstwad.docker_ubuntu role in your `~/.ansible/roles/` path
         ansible-galaxy install angstwad.docker_ubuntu
-6. run
-        ansible-playbook -i prod site.yml --vault-password-file .vault_pass
+1. run
+        ansible-playbook -i prod site.yml --vault-password-file ~/.vault_pass.txt
+- --ask-sudo-pass also likely to be needed
+
+__Ansible will now run, but a lot of things will be wrong__
+
+
+## Fix the config files
+
+In a few places, there are hardcoded usernames (andrew) and network addresses in 10.0.0.0/24. After discovering they existed I found all of them with
+    
+    find ./ -type f -exec bash -c "grep -i "andrew" {} && echo {} && echo " ';'
+
+and
+
+    find ./ -type f -exec bash -c "grep -i "10\.0" {} && echo {} && echo " ';'
+
+
+The username needs to be changed in
+- roles/ec3/tasks/main.yml: //10.0.0.62/data/home/andrew/docker should be set to an area on your NAS the containers can use
+- roles/ec3/vars/main.yml: Change the NAS address, change the username you want made on the host (and the password too)
+- prod and host_vars/vault.yml (but these have already been changed)
+
+
+The network range/addresses need to be changed in
+- roles/ec3/tasks/main.yml: As above, make the IP right for your NAS
+- roles/ec3/tasks/transmission.yml: Change the subnet range of your local network in LOCAL_NETWORK
+- roles/ec3/vars/main.yml: Change the NAS address
+
+
+
+The default SMB mount will need its server address changed, but leaving it as /docker is easier as that's what all the docker containers expect in their exports. 
+I also made another mount that mounts to a more general directory for me. Add the mount in roles/ec3/tasks/main.yml if you want it to be done automatically, otherwise modify the media server's fstab yourself. It will be something like:
+
+    - name: Mount media on NAS
+      mount: 
+        state: "mounted" 
+        fstype: "cifs" 
+        opts: "username={{nas_user}},password={{nas_pass}},uid={{user.name}},gid={{user.name}},file_mode=0755,dir_mode=0755,exec" 
+        src: //10.0.0.105/media/
+        name: "/media/NAS"
+
+
+Note: Container configs are stored in /opt/amc (that's where the ansible/docker combo puts them)
+
+
+In roles/ec3/tasks/transmission.yml, make volume exports so that the complete and incomplete dirs used by transmission are somewhere good (for me, this means both on my NAS).
+ - /docker/incomplete:/data/incomplete
+ - /docker/complete:/data/completed
+ - Remember that volume exports are <HOST_DIR>:<DIR_INSIDE_CONTAINER> and it means that in the docker container, that directory is exactly what it is on the host.
+
+
+I also had to  add a mount for the general NAS media directory in the Plex container
+- /media/NAS:/data/nas under volumes: in roles/ec3/tasks/plex.yml
+
+
+Another note is that the PIA server is set to Sweden by default in transmission.yml. I didn't get any speed issues, but depending on your location your may want something more local (or not!).
+
 
 ## Containers used
 
@@ -47,11 +111,9 @@ An automation tool to track TV
 
 A proxy server that standardizes communication for sonarr and radarr to search.
 
-### Muximux
+### Heimdall
 
-linuxserver/docker-muximux
-
-A single place for your web applications. 
+It seems the project used to use muximux but is uses heimdall now. You'll find it, once it's setup it's what you get from just a normal web connection to the server. 
 
 ## Other Stuff
 
