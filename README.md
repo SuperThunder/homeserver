@@ -13,9 +13,13 @@
 4. Create ~/.vault_pass.txt with password for decrypt during provision
     - This is just a file containing only your password you just made. It seems common that it goes into your home directory. `chmod` the permissions to 600, at least.
 5. Make sure you have the angstwad.docker_ubuntu role in your `~/.ansible/roles/` path
+
         ansible-galaxy install angstwad.docker_ubuntu
+
 6. run
+
         ansible-playbook -i prod site.yml --vault-password-file ~/.vault_pass.txt
+
     - --ask-sudo-pass also likely to be needed
 
 __Ansible will now run, but a lot of things will be wrong__
