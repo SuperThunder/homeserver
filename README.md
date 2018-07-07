@@ -57,8 +57,6 @@ I also made another mount that mounts to a more general directory for me. Add th
         name: "/media/NAS"
 
 
-Note: Container configs are stored in /opt/amc (that's where the ansible/docker combo puts them)
-
 
 In roles/ec3/tasks/transmission.yml, make volume exports so that the complete and incomplete dirs used by transmission are somewhere good (for me, this means both on my NAS).
  - /docker/incomplete:/data/incomplete
@@ -70,7 +68,16 @@ I also had to  add a mount for the general NAS media directory in the Plex conta
 - /media/NAS:/data/nas under volumes: in roles/ec3/tasks/plex.yml
 
 
-Another note is that the PIA server is set to Sweden by default in transmission.yml. I didn't get any speed issues, but depending on your location your may want something more local (or not!).
+When testing transmission I ran into issues of it totally filling up the OS drive since it used it for the incomplete directory. However, another part of the problem is that the default transmission web GUI is very bare and does not let you only download parts of a torrent. After some searching I found that seemingly the only way to fix this is to use a (custom UI made by someone in China for a google summer of code)[https://github.com/ronggang/transmission-web-control/wiki].
+- Enter your transmission container with `sudo docker exec -it transmission /bin/bash` on the media server hosting your containers
+- (Download the install script and run it, and when you refresh the transmission page you should have a much better UI)[https://github.com/ronggang/transmission-web-control/wiki/Linux-Installation]
+
+####Small notes: 
+- Container configs are stored in /opt/amc (that's where the ansible/docker combo puts them)
+- The PIA server is set to Sweden by default in transmission.yml. I didn't get any speed issues, but depending on your location your may want something more local (or not!)
+- To reach transmission's control server, connect to <media-server-ip-or-hostname>:9091/transmission
+- To reach plex, connect to <media-server>:32400
+
 
 
 ## Containers used
