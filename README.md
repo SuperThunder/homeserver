@@ -61,7 +61,7 @@ I also made another mount that mounts to a more general directory for me. Add th
 In roles/ec3/tasks/transmission.yml, make volume exports so that the complete and incomplete dirs used by transmission are somewhere good (for me, this means both on my NAS).
  - /docker/incomplete:/data/incomplete
  - /docker/complete:/data/completed
- - Remember that volume exports are <HOST_DIR>:<DIR_INSIDE_CONTAINER> and it means that in the docker container, that directory is exactly what it is on the host.
+ - Remember that volume exports are \<HOST_DIR\>:\<DIR_INSIDE_CONTAINER\> and it means that in the docker container, that directory is exactly what it is on the host.
 
 
 I also had to  add a mount for the general NAS media directory in the Plex container
@@ -72,11 +72,11 @@ When testing transmission I ran into issues of it totally filling up the OS driv
 - Enter your transmission container with `sudo docker exec -it transmission /bin/bash` on the media server hosting your containers
 - (Download the install script and run it, and when you refresh the transmission page you should have a much better UI)[https://github.com/ronggang/transmission-web-control/wiki/Linux-Installation]
 
-####Small notes: 
+### Small notes: 
 - Container configs are stored in /opt/amc (that's where the ansible/docker combo puts them)
 - The PIA server is set to Sweden by default in transmission.yml. I didn't get any speed issues, but depending on your location your may want something more local (or not!)
-- To reach transmission's control server, connect to <media-server-ip-or-hostname>:9091/transmission
-- To reach plex, connect to <media-server>:32400
+- To reach transmission's control server, connect to \<media-server-ip-or-hostname\>:9091/transmission
+- To reach plex, connect to \<media-server\>:32400
 
 
 
