@@ -55,6 +55,14 @@
     src: //10.0.0.62/data/home/andrew/docker
     name: "/docker"
   handler: Restart docker
+- name: mount share for transmission
+  mount: 
+    state: "mounted" 
+    fstype: "cifs" 
+    opts: "username={{nas_user}},password={{nas_pass}},uid={{user.name}},gid={{user.name}},file_mode=0755,dir_mode=0755,exec" 
+    src: //10.0.0.62/transmission
+    name: "/media/transmission"
+  handler: Restart docker
 - import_tasks: 'plex.yml'
 - import_tasks: 'sonarr.yml'
 - import_tasks: 'radarr.yml'

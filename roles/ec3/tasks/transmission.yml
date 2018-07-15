@@ -22,7 +22,8 @@
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - "{{containers_folder}}/transmission/data:/data/transmission-home"
-      - /docker/downloads:/data/completed
+      - /media/Transmission/downloads:/data/completed
+      - /media/Transmission/incomplete:/data/incomplete
     capabilities:
       - NET_ADMIN
     devices:

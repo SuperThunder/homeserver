@@ -142,6 +142,8 @@ It is useful to have a quick way to test the playbook and not change the server 
 
 Simple nginx proxy server to route traffic between containers with pseudo-DNS names.
 
+Add nginx reverse proxy to ansible setup so that transmission web page is accessible from outside the OS running the transmission container
+
 Post system requirements.
 
 ## Legal Stuff
